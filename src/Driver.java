@@ -5,5 +5,8 @@
 public class Driver {
     public static void main(String[] args) {
         String filename = "GameOfLife1.txt";
+        Environment envo = new Environment(filename);
+
+        envo.runSimulation();
     }
 }
