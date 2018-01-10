@@ -1,3 +1,4 @@
+import com.sun.istack.internal.NotNull;
 import edu.princeton.cs.introcs.StdDraw;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,9 +13,9 @@ public class Environment {
     private int rows, columns;
     /** An array of Cell objects, which represent organisms in the game */
     private Cell[][] cells;
-    private Cell[][] test;
 
     Environment(String initConfig){
+
         /* A Scanner object to read setting files */
         Scanner fileIn = null;
         try {
@@ -23,6 +24,8 @@ public class Environment {
             System.out.println("File not found");
             System.exit(1);
         }
+
+        /* Setting size of cell array */
         this.rows = fileIn.nextInt();
         this.columns = fileIn.nextInt();
         cells = new Cell[rows][columns];
@@ -39,13 +42,14 @@ public class Environment {
                 }
             }
         }
-
+        /* Closing scanner obj */
         fileIn.close();
+
         /* Setting up canvas to draw on */
         StdDraw.setCanvasSize(columns*20, rows*20);
         StdDraw.setXscale(0, columns);
         StdDraw.setYscale(0, rows);
-        StdDraw.enableDoubleBuffering();
+
     }
 
     /**
@@ -53,6 +57,7 @@ public class Environment {
      */
     public void runSimulation(){
 
+        //noinspection InfiniteLoopStatement
         for(;;) {
             drawBoard(cells);
             cells = nextBoard();
@@ -64,12 +69,6 @@ public class Environment {
      */
     private void drawBoard(Cell[][] board){
         StdDraw.clear();
-
-        //TODO ADD RULES:
-        //RULE 1: Any living creature (occupied cell) with fewer than two live neighbors dies
-        //RULE 2: Any creature with 2 or 3 neighbors lives
-        //RULE 3: Any creature with more than 3 neighbors dies
-        //RULE 4: Any empty cell with 3 neighbors becomes occupied
 
         for (int i = 0; i < board.length; i++){
             for (int j = 0; j < board[i].length; j++){
@@ -91,9 +90,6 @@ public class Environment {
      */
     private int numberOfNeighbors(int row, int column){
         int count = 0;
-
-
-
         for (int i = row-1; i < row+2; i++){
             for (int j = column -1; j < column+2; j++){
                 if (i == row && j == column)
@@ -110,16 +106,26 @@ public class Environment {
         return count;
     }
 
+
+    /**
+     * Creates an updated version of the board, all at once
+     * @return      An array of Cells, updated to the next "generation"
+     */
     private Cell[][] nextBoard(){
-
-
 
         // Modifying a temp array while observing the "real" array, to make sure changes to the board do not effect
         // other cells of the same generation
         Cell[][] tempArray = new Cell[rows][columns];
         for (int i  = 0; i < tempArray.length; i++){
-              tempArray[i] = cells[i].clone();
+              for (int j = 0; j < tempArray[i].length; j++){
+                  if (cells[i][j].getOccupied()) {
+                      tempArray[i][j] = new Cell(true);
+                  } else {
+                      tempArray[i][j] = new Cell(false);
+                  }
+              }
         }
+
         for (int i = 0; i < cells.length; i++){
             for (int j = 0; j < cells[i].length; j++){
                 /* Any occupied cell with fewer than two live neighbors dies */
@@ -135,10 +141,8 @@ public class Environment {
                 if (!cells[i][j].getOccupied() && numberOfNeighbors(i,j) == 3){
                     tempArray[i][j].setOccupied(true);
                 }
-
             }
         }
-        
         return tempArray;
     }
 }
