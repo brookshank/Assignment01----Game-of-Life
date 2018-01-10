@@ -51,7 +51,7 @@ public class Environment {
      * A method, called from the driver, which runs the "game"
      */
     public void runSimulation(){
-        System.out.println(numberOfNeighbors(2,2));
+
         for(;;) {
             drawBoard(cells);
             test = nextBoard();
@@ -114,8 +114,6 @@ public class Environment {
         // Modifying a temp array while observing the "real" array, to make sure changes to the board do not effect
         // other cells of the same generation
         Cell[][] temp = cells;
-        int debugCountRunsOuter  = 0;
-        int debugCountRunsInner = 0;
 
         for (int i = 0; i < cells.length; i++){
             for (int j = 0; j < cells[i].length; j++){
@@ -123,7 +121,7 @@ public class Environment {
                 if (cells[i][j].getOccupied() && numberOfNeighbors(i, j) < 2){
                     System.out.println(numberOfNeighbors(i, j));
                     System.out.println("Cell died at " + i + "," + j);
-                    temp[i][j].setOccupied(true);
+                    temp[i][j].setOccupied(false);
                     drawBoard(cells);
                     System.out.println("reprinted board");
                 }
@@ -140,14 +138,10 @@ public class Environment {
                     System.out.println("Cell born at " + i + "," + j);
                     temp[i][j].setOccupied(true);
                 }
-                debugCountRunsInner++;
 
             }
-            debugCountRunsOuter++;
         }
-        System.out.println(cells[0].length);
-        System.out.println("Outer " + debugCountRunsOuter);
-        System.out.println("Inner " + debugCountRunsInner);
+        
         return temp;
     }
 }
