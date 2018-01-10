@@ -8,16 +8,15 @@ import java.util.Scanner;
  * Class responsible for running the simulation
  */
 public class Environment {
+    /** The number of rows and columns of the current setting */
     private int rows, columns;
+    /** An array of Cell objects, which represent organisms in the game */
     private Cell[][] cells;
-    private Scanner fileIn = null;
+    private Cell[][] test;
 
     Environment(String initConfig){
-        //TODO read initial settings from file
-        // for now, using static config
-
-        // These will be replaced with settings from file
-
+        /* A Scanner object to read setting files */
+        Scanner fileIn = null;
         try {
             fileIn = new Scanner(new FileInputStream(initConfig));
         } catch (FileNotFoundException e){
@@ -45,34 +44,110 @@ public class Environment {
         StdDraw.setCanvasSize(columns*20, rows*20);
         StdDraw.setXscale(0, columns);
         StdDraw.setYscale(0, rows);
+        StdDraw.enableDoubleBuffering();
     }
 
-
-
+    /**
+     * A method, called from the driver, which runs the "game"
+     */
     public void runSimulation(){
-
-
-
-
+        System.out.println(numberOfNeighbors(2,2));
+        for(;;) {
+            drawBoard(cells);
+            test = nextBoard();
+        }
     }
 
-    private void drawBoard(){
+    /**
+     * A method which draws the current state of the board using StdDraw
+     */
+    private void drawBoard(Cell[][] board){
+        StdDraw.clear();
 
         //TODO ADD RULES:
         //RULE 1: Any living creature (occupied cell) with fewer than two live neighbors dies
         //RULE 2: Any creature with 2 or 3 neighbors lives
         //RULE 3: Any creature with more than 3 neighbors dies
-        //RULE 4: Any empty cell with 3 neighbors becomes occupied 
+        //RULE 4: Any empty cell with 3 neighbors becomes occupied
 
-        for (int i = 0; i < rows; i++){
-            for (int j = 0; j < columns; j++){
+        for (int i = 0; i < board.length; i++){
+            for (int j = 0; j < board[i].length; j++){
 
-                if(cells[i][j].get_occupied()){
-                    StdDraw.filledRectangle(0.5+ j, rows - (0.5 + i), 0.5, 0.5);
+                if(board[i][j].getOccupied()){
+                    StdDraw.filledRectangle(0.5+ j, board.length - (0.5 + i), 0.5, 0.5);
                 }
             }
         }
-
+        StdDraw.show();
+        StdDraw.pause(1000);
     }
 
+    /**
+     * A method for determining how many neighbors a coordinate in the array has
+     * @param row       The INDEX of the position in the first array
+     * @param column    The INDEX of the array in the first array
+     * @return          The number of neighbors the given position has
+     */
+    private int numberOfNeighbors(int row, int column){
+        int count = 0;
+
+
+
+        for (int i = row-1; i < row+2; i++){
+            for (int j = column -1; j < column+2; j++){
+                if (i == row && j == column)
+                    continue;
+
+                // Counting places off of the board as uninhabited
+                if (i >= rows || i <0 || j < 0 || j >= columns){
+                    continue;
+                }
+                 if (cells[i][j].getOccupied())
+                     count++;
+            }
+        }
+        return count;
+    }
+
+    private Cell[][] nextBoard(){
+
+        // Modifying a temp array while observing the "real" array, to make sure changes to the board do not effect
+        // other cells of the same generation
+        Cell[][] temp = cells;
+        int debugCountRunsOuter  = 0;
+        int debugCountRunsInner = 0;
+
+        for (int i = 0; i < cells.length; i++){
+            for (int j = 0; j < cells[i].length; j++){
+                /* Any occupied cell with fewer than two live neighbors dies */
+                if (cells[i][j].getOccupied() && numberOfNeighbors(i, j) < 2){
+                    System.out.println(numberOfNeighbors(i, j));
+                    System.out.println("Cell died at " + i + "," + j);
+                    temp[i][j].setOccupied(true);
+                    drawBoard(cells);
+                    System.out.println("reprinted board");
+                }
+                /* Any occupied cell with more than 3 neighbors dies */
+                if (cells[i][j].getOccupied() && numberOfNeighbors(i,j) > 3){
+                    System.out.println(numberOfNeighbors(i, j));
+                    System.out.println("Cell died at " + i + "," + j);
+                    temp[i][j].setOccupied(false);
+                }
+
+                /* Any unoccupied cell with exactly three neighbors becomes occupied */
+                if (!cells[i][j].getOccupied() && numberOfNeighbors(i,j) == 3){
+                    System.out.println(numberOfNeighbors(i, j));
+                    System.out.println("Cell born at " + i + "," + j);
+                    temp[i][j].setOccupied(true);
+                }
+                debugCountRunsInner++;
+
+            }
+            debugCountRunsOuter++;
+        }
+        System.out.println(cells[0].length);
+        System.out.println("Outer " + debugCountRunsOuter);
+        System.out.println("Inner " + debugCountRunsInner);
+        return temp;
+    }
 }

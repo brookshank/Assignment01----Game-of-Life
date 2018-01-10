@@ -9,8 +9,12 @@ public class Cell {
         this.occupied = occupied;
     }
 
-    boolean get_occupied(){
+    boolean getOccupied(){
         return occupied;
+    }
+
+    void setOccupied(boolean occupied){
+        this.occupied = occupied;
     }
 
 }
