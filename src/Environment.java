@@ -40,6 +40,7 @@ public class Environment {
             }
         }
 
+        fileIn.close();
         /* Setting up canvas to draw on */
         StdDraw.setCanvasSize(columns*20, rows*20);
         StdDraw.setXscale(0, columns);
@@ -54,7 +55,7 @@ public class Environment {
 
         for(;;) {
             drawBoard(cells);
-            test = nextBoard();
+            cells = nextBoard();
         }
     }
 
@@ -111,37 +112,33 @@ public class Environment {
 
     private Cell[][] nextBoard(){
 
+
+
         // Modifying a temp array while observing the "real" array, to make sure changes to the board do not effect
         // other cells of the same generation
-        Cell[][] temp = cells;
-
+        Cell[][] tempArray = new Cell[rows][columns];
+        for (int i  = 0; i < tempArray.length; i++){
+              tempArray[i] = cells[i].clone();
+        }
         for (int i = 0; i < cells.length; i++){
             for (int j = 0; j < cells[i].length; j++){
                 /* Any occupied cell with fewer than two live neighbors dies */
                 if (cells[i][j].getOccupied() && numberOfNeighbors(i, j) < 2){
-                    System.out.println(numberOfNeighbors(i, j));
-                    System.out.println("Cell died at " + i + "," + j);
-                    temp[i][j].setOccupied(false);
-                    drawBoard(cells);
-                    System.out.println("reprinted board");
+                    tempArray[i][j].setOccupied(false);
                 }
                 /* Any occupied cell with more than 3 neighbors dies */
                 if (cells[i][j].getOccupied() && numberOfNeighbors(i,j) > 3){
-                    System.out.println(numberOfNeighbors(i, j));
-                    System.out.println("Cell died at " + i + "," + j);
-                    temp[i][j].setOccupied(false);
+                    tempArray[i][j].setOccupied(false);
                 }
 
                 /* Any unoccupied cell with exactly three neighbors becomes occupied */
                 if (!cells[i][j].getOccupied() && numberOfNeighbors(i,j) == 3){
-                    System.out.println(numberOfNeighbors(i, j));
-                    System.out.println("Cell born at " + i + "," + j);
-                    temp[i][j].setOccupied(true);
+                    tempArray[i][j].setOccupied(true);
                 }
 
             }
         }
         
-        return temp;
+        return tempArray;
     }
 }
