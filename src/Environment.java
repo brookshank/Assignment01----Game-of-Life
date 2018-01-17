@@ -1,4 +1,3 @@
-
 import edu.princeton.cs.introcs.StdDraw;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
