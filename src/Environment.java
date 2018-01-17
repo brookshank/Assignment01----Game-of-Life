@@ -1,4 +1,4 @@
-import com.sun.istack.internal.NotNull;
+
 import edu.princeton.cs.introcs.StdDraw;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -14,6 +14,10 @@ public class Environment {
     /** An array of Cell objects, which represent organisms in the game */
     private Cell[][] cells;
 
+    /**
+     * A Constructor which creates an Environment with the correct sized array, from a file. 0=space, 1= filled.
+     * @param initConfig    A txt file of a "starting position", first 2 numbers are sizes and rest are content
+     */
     Environment(String initConfig){
 
         /* A Scanner object to read setting files */
@@ -32,6 +36,7 @@ public class Environment {
 
         //Assuming that the file is correct and have the correct number of entries
         int temp;
+        /* Creating Cell array, based on the 1s and 0s of the text file */
         for (int i = 0; i < rows; i++){
             for (int j = 0; j < columns; j++){
                 temp = fileIn.nextInt();
@@ -57,6 +62,7 @@ public class Environment {
      */
     public void runSimulation(){
 
+        /* Draws and assigns next board state*/
         //noinspection InfiniteLoopStatement
         for(;;) {
             drawBoard(cells);
@@ -68,8 +74,10 @@ public class Environment {
      * A method which draws the current state of the board using StdDraw
      */
     private void drawBoard(Cell[][] board){
+
         StdDraw.clear();
 
+        /* Drawing board based on what is currently occupied */
         for (int i = 0; i < board.length; i++){
             for (int j = 0; j < board[i].length; j++){
 
@@ -90,6 +98,7 @@ public class Environment {
      */
     private int numberOfNeighbors(int row, int column){
         int count = 0;
+        /* Starting at the top left corner of the 8x8 "cube" around the cell */
         for (int i = row-1; i < row+2; i++){
             for (int j = column -1; j < column+2; j++){
                 if (i == row && j == column)
